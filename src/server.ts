@@ -11,5 +11,4 @@ connectDB();
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(chalk.red(`Server running on port ${PORT}`));
-  console.log(`Test with: http://localhost:${PORT}`);
 });

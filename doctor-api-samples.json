@@ -1,0 +1,410 @@
+{
+  "doctor_endpoints": {
+    "base_url": "http://localhost:3002/api/doctors",
+    "endpoints": {
+      "create_doctor": {
+        "method": "POST",
+        "url": "/",
+        "description": "Create a new doctor",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "sample_payload": {
+          "firstName": "John",
+          "lastName": "Doe",
+          "email": "john.doe@hospital.com",
+          "phone": "+1-555-0123",
+          "specialization": "Cardiology",
+          "department": "Cardiology",
+          "experience": 10,
+          "qualification": "MD, FACC",
+          "consultationFee": 250,
+          "availableDays": ["Monday", "Wednesday", "Friday"],
+          "availableTime": {
+            "start": "09:00",
+            "end": "17:00"
+          }
+        },
+        "expected_response": {
+          "success": true,
+          "message": "Doctor created successfully",
+          "data": {
+            "_id": "generated_mongodb_id",
+            "doctorId": "DOC1697890123ABC",
+            "firstName": "John",
+            "lastName": "Doe",
+            "email": "john.doe@hospital.com",
+            "phone": "+1-555-0123",
+            "specialization": "Cardiology",
+            "department": "Cardiology",
+            "experience": 10,
+            "qualification": "MD, FACC",
+            "consultationFee": 250,
+            "availableDays": ["Monday", "Wednesday", "Friday"],
+            "availableTime": {
+              "start": "09:00",
+              "end": "17:00"
+            },
+            "isActive": true,
+            "createdAt": "2026-01-24T10:00:00.000Z",
+            "updatedAt": "2026-01-24T10:00:00.000Z"
+          }
+        }
+      },
+      "get_all_doctors": {
+        "method": "GET",
+        "url": "/",
+        "description": "Get all doctors with optional filters",
+        "query_parameters": {
+          "isActive": "boolean (optional) - Filter by active status",
+          "specialization": "string (optional) - Filter by specialization",
+          "department": "string (optional) - Filter by department",
+          "page": "number (optional, default: 1) - Page number",
+          "limit": "number (optional, default: 10) - Items per page"
+        },
+        "sample_requests": [
+          {
+            "name": "Get all active doctors",
+            "url": "/?isActive=true&page=1&limit=5"
+          },
+          {
+            "name": "Get cardiologists",
+            "url": "/?specialization=Cardiology"
+          },
+          {
+            "name": "Get doctors from Cardiology department",
+            "url": "/?department=Cardiology&isActive=true"
+          }
+        ],
+        "expected_response": {
+          "success": true,
+          "message": "Doctors retrieved successfully",
+          "data": [
+            {
+              "_id": "doctor_id_1",
+              "doctorId": "DOC1697890123ABC",
+              "firstName": "John",
+              "lastName": "Doe",
+              "email": "john.doe@hospital.com",
+              "phone": "+1-555-0123",
+              "specialization": "Cardiology",
+              "department": "Cardiology",
+              "experience": 10,
+              "qualification": "MD, FACC",
+              "consultationFee": 250,
+              "availableDays": ["Monday", "Wednesday", "Friday"],
+              "availableTime": {
+                "start": "09:00",
+                "end": "17:00"
+              },
+              "isActive": true,
+              "createdAt": "2026-01-24T10:00:00.000Z",
+              "updatedAt": "2026-01-24T10:00:00.000Z"
+            }
+          ],
+          "pagination": {
+            "total": 1,
+            "page": 1,
+            "totalPages": 1,
+            "limit": 10
+          }
+        }
+      },
+      "get_doctor_by_id": {
+        "method": "GET",
+        "url": "/{id}",
+        "description": "Get doctor by MongoDB ID",
+        "parameters": {
+          "id": "MongoDB ObjectID of the doctor"
+        },
+        "sample_request": {
+          "url": "/507f1f77bcf86cd799439011"
+        },
+        "expected_response": {
+          "success": true,
+          "message": "Doctor retrieved successfully",
+          "data": {
+            "_id": "507f1f77bcf86cd799439011",
+            "doctorId": "DOC1697890123ABC",
+            "firstName": "John",
+            "lastName": "Doe",
+            "email": "john.doe@hospital.com",
+            "phone": "+1-555-0123",
+            "specialization": "Cardiology",
+            "department": "Cardiology",
+            "experience": 10,
+            "qualification": "MD, FACC",
+            "consultationFee": 250,
+            "availableDays": ["Monday", "Wednesday", "Friday"],
+            "availableTime": {
+              "start": "09:00",
+              "end": "17:00"
+            },
+            "isActive": true,
+            "createdAt": "2026-01-24T10:00:00.000Z",
+            "updatedAt": "2026-01-24T10:00:00.000Z"
+          }
+        },
+        "error_response": {
+          "success": false,
+          "message": "Doctor not found"
+        }
+      },
+      "get_doctor_by_doctor_id": {
+        "method": "GET",
+        "url": "/doctor-id/{doctorId}",
+        "description": "Get doctor by custom doctorId",
+        "parameters": {
+          "doctorId": "Custom doctor ID (e.g., DOC1697890123ABC)"
+        },
+        "sample_request": {
+          "url": "/doctor-id/DOC1697890123ABC"
+        },
+        "expected_response": {
+          "success": true,
+          "message": "Doctor retrieved successfully",
+          "data": {
+            "_id": "507f1f77bcf86cd799439011",
+            "doctorId": "DOC1697890123ABC",
+            "firstName": "John",
+            "lastName": "Doe",
+            "email": "john.doe@hospital.com"
+          }
+        }
+      },
+      "update_doctor_by_id": {
+        "method": "PUT",
+        "url": "/{id}",
+        "description": "Update doctor by MongoDB ID",
+        "parameters": {
+          "id": "MongoDB ObjectID of the doctor"
+        },
+        "sample_payload": {
+          "firstName": "John",
+          "lastName": "Smith",
+          "email": "john.smith@hospital.com",
+          "consultationFee": 300,
+          "availableDays": ["Monday", "Tuesday", "Wednesday", "Friday"],
+          "availableTime": {
+            "start": "08:00",
+            "end": "16:00"
+          }
+        },
+        "expected_response": {
+          "success": true,
+          "message": "Doctor updated successfully",
+          "data": {
+            "_id": "507f1f77bcf86cd799439011",
+            "doctorId": "DOC1697890123ABC",
+            "firstName": "John",
+            "lastName": "Smith",
+            "email": "john.smith@hospital.com",
+            "consultationFee": 300,
+            "availableDays": ["Monday", "Tuesday", "Wednesday", "Friday"],
+            "availableTime": {
+              "start": "08:00",
+              "end": "16:00"
+            }
+          }
+        }
+      },
+      "update_doctor_by_doctor_id": {
+        "method": "PUT",
+        "url": "/doctor-id/{doctorId}",
+        "description": "Update doctor by custom doctorId",
+        "parameters": {
+          "doctorId": "Custom doctor ID"
+        },
+        "sample_payload": {
+          "specialization": "Interventional Cardiology",
+          "experience": 12,
+          "qualification": "MD, FACC, FSCAI"
+        }
+      },
+      "delete_doctor_by_id": {
+        "method": "DELETE",
+        "url": "/{id}",
+        "description": "Soft delete doctor by MongoDB ID (sets isActive to false)",
+        "parameters": {
+          "id": "MongoDB ObjectID of the doctor"
+        },
+        "expected_response": {
+          "success": true,
+          "message": "Doctor deactivated successfully",
+          "data": {
+            "_id": "507f1f77bcf86cd799439011",
+            "doctorId": "DOC1697890123ABC",
+            "isActive": false
+          }
+        }
+      },
+      "delete_doctor_by_doctor_id": {
+        "method": "DELETE",
+        "url": "/doctor-id/{doctorId}",
+        "description": "Soft delete doctor by custom doctorId (sets isActive to false)",
+        "parameters": {
+          "doctorId": "Custom doctor ID"
+        }
+      },
+      "hard_delete_doctor_by_id": {
+        "method": "DELETE",
+        "url": "/{id}/hard",
+        "description": "Permanently delete doctor by MongoDB ID",
+        "parameters": {
+          "id": "MongoDB ObjectID of the doctor"
+        },
+        "expected_response": {
+          "success": true,
+          "message": "Doctor deleted permanently",
+          "data": {
+            "_id": "507f1f77bcf86cd799439011",
+            "doctorId": "DOC1697890123ABC",
+            "firstName": "John",
+            "lastName": "Doe"
+          }
+        }
+      },
+      "hard_delete_doctor_by_doctor_id": {
+        "method": "DELETE",
+        "url": "/doctor-id/{doctorId}/hard",
+        "description": "Permanently delete doctor by custom doctorId",
+        "parameters": {
+          "doctorId": "Custom doctor ID"
+        }
+      },
+      "get_doctors_by_specialization": {
+        "method": "GET",
+        "url": "/specialization/{specialization}",
+        "description": "Get doctors by specialization",
+        "parameters": {
+          "specialization": "Medical specialization (e.g., Cardiology, Neurology)"
+        },
+        "sample_requests": [
+          {
+            "name": "Get cardiologists",
+            "url": "/specialization/Cardiology"
+          },
+          {
+            "name": "Get neurologists",
+            "url": "/specialization/Neurology"
+          }
+        ]
+      },
+      "get_doctors_by_department": {
+        "method": "GET",
+        "url": "/department/{department}",
+        "description": "Get doctors by department",
+        "parameters": {
+          "department": "Hospital department (e.g., Cardiology, Emergency)"
+        }
+      },
+      "search_doctors_by_name": {
+        "method": "GET",
+        "url": "/search/{searchTerm}",
+        "description": "Search doctors by name (first name, last name, or full name)",
+        "parameters": {
+          "searchTerm": "Name to search for"
+        },
+        "sample_requests": [
+          {
+            "name": "Search for John",
+            "url": "/search/John"
+          },
+          {
+            "name": "Search for Smith",
+            "url": "/search/Smith"
+          }
+        ]
+      },
+      "get_available_doctors": {
+        "method": "GET",
+        "url": "/available",
+        "description": "Get available doctors for specific day and time",
+        "query_parameters": {
+          "day": "Day of the week (Monday, Tuesday, etc.)",
+          "time": "Time in HH:MM format (24-hour)"
+        },
+        "sample_requests": [
+          {
+            "name": "Get doctors available Monday at 10:00",
+            "url": "/available?day=Monday&time=10:00"
+          },
+          {
+            "name": "Get doctors available Friday at 14:30",
+            "url": "/available?day=Friday&time=14:30"
+          }
+        ]
+      }
+    },
+    "curl_examples": {
+      "create_doctor": "curl -X POST http://localhost:3002/api/doctors -H \"Content-Type: application/json\" -d '{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"john.doe@hospital.com\",\"phone\":\"+1-555-0123\",\"specialization\":\"Cardiology\",\"department\":\"Cardiology\",\"experience\":10,\"qualification\":\"MD, FACC\",\"consultationFee\":250,\"availableDays\":[\"Monday\",\"Wednesday\",\"Friday\"],\"availableTime\":{\"start\":\"09:00\",\"end\":\"17:00\"}}'",
+      "get_all_doctors": "curl -X GET \"http://localhost:3002/api/doctors?isActive=true&page=1&limit=5\" -H \"Content-Type: application/json\"",
+      "get_doctor_by_id": "curl -X GET http://localhost:3002/api/doctors/507f1f77bcf86cd799439011 -H \"Content-Type: application/json\"",
+      "update_doctor": "curl -X PUT http://localhost:3002/api/doctors/507f1f77bcf86cd799439011 -H \"Content-Type: application/json\" -d '{\"firstName\":\"John\",\"lastName\":\"Smith\",\"consultationFee\":300}'",
+      "delete_doctor": "curl -X DELETE http://localhost:3002/api/doctors/507f1f77bcf86cd799439011 -H \"Content-Type: application/json\"",
+      "hard_delete_doctor": "curl -X DELETE http://localhost:3002/api/doctors/507f1f77bcf86cd799439011/hard -H \"Content-Type: application/json\"",
+      "get_by_specialization": "curl -X GET http://localhost:3002/api/doctors/specialization/Cardiology -H \"Content-Type: application/json\"",
+      "search_doctors": "curl -X GET http://localhost:3002/api/doctors/search/John -H \"Content-Type: application/json\"",
+      "get_available": "curl -X GET \"http://localhost:3002/api/doctors/available?day=Monday&time=10:00\" -H \"Content-Type: application/json\""
+    },
+    "sample_doctors": [
+      {
+        "name": "Cardiologist",
+        "data": {
+          "firstName": "Sarah",
+          "lastName": "Johnson",
+          "email": "sarah.johnson@hospital.com",
+          "phone": "+1-555-0124",
+          "specialization": "Cardiology",
+          "department": "Cardiology",
+          "experience": 15,
+          "qualification": "MD, FACC, FSCAI",
+          "consultationFee": 350,
+          "availableDays": ["Monday", "Tuesday", "Thursday", "Friday"],
+          "availableTime": {
+            "start": "08:00",
+            "end": "16:00"
+          }
+        }
+      },
+      {
+        "name": "Neurologist",
+        "data": {
+          "firstName": "Michael",
+          "lastName": "Chen",
+          "email": "michael.chen@hospital.com",
+          "phone": "+1-555-0125",
+          "specialization": "Neurology",
+          "department": "Neurology",
+          "experience": 8,
+          "qualification": "MD, FAAN",
+          "consultationFee": 280,
+          "availableDays": ["Wednesday", "Thursday", "Friday"],
+          "availableTime": {
+            "start": "09:00",
+            "end": "17:00"
+          }
+        }
+      },
+      {
+        "name": "Pediatrician",
+        "data": {
+          "firstName": "Emily",
+          "lastName": "Wilson",
+          "email": "emily.wilson@hospital.com",
+          "phone": "+1-555-0126",
+          "specialization": "Pediatrics",
+          "department": "Pediatrics",
+          "experience": 12,
+          "qualification": "MD, FAAP",
+          "consultationFee": 200,
+          "availableDays": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+          "availableTime": {
+            "start": "08:30",
+            "end": "16:30"
+          }
+        }
+      }
+    ]
+  }
+}
