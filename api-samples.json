@@ -1,0 +1,277 @@
+{
+  "endpoints": {
+    "base_url": "http://localhost:3000/api/appointments",
+    "methods": {
+      "POST": {
+        "description": "Create a new appointment",
+        "url": "/",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": {
+          "DocID": "DOC001",
+          "PatientID": "PAT001",
+          "PatientEmail": "john.doe@example.com",
+          "PatientAddress": "123 Main St, New York, NY 10001",
+          "PatientAppointmentDate": "2026-01-25T10:00:00.000Z"
+        },
+        "sample_requests": [
+          {
+            "name": "Sample Appointment 1",
+            "body": {
+              "DocID": "DOC001",
+              "PatientID": "PAT001",
+              "PatientEmail": "john.doe@example.com",
+              "PatientAddress": "123 Main St, New York, NY 10001",
+              "PatientAppointmentDate": "2026-01-25T10:00:00.000Z"
+            }
+          },
+          {
+            "name": "Sample Appointment 2",
+            "body": {
+              "DocID": "DOC002",
+              "PatientID": "PAT002",
+              "PatientEmail": "jane.smith@example.com",
+              "PatientAddress": "456 Oak Ave, Los Angeles, CA 90001",
+              "PatientAppointmentDate": "2026-01-26T14:30:00.000Z"
+            }
+          },
+          {
+            "name": "Sample Appointment 3",
+            "body": {
+              "DocID": "DOC003",
+              "PatientID": "PAT003",
+              "PatientEmail": "bob.wilson@example.com",
+              "PatientAddress": "789 Pine Rd, Chicago, IL 60601",
+              "PatientAppointmentDate": "2026-01-27T09:15:00.000Z"
+            }
+          }
+        ],
+        "expected_response": {
+          "status": 201,
+          "body": {
+            "_id": "generated_mongodb_id",
+            "DocID": "DOC001",
+            "PatientID": "PAT001",
+            "PatientEmail": "john.doe@example.com",
+            "PatientAddress": "123 Main St, New York, NY 10001",
+            "PatientAppointmentDate": "2026-01-25T10:00:00.000Z",
+            "AppointmentStatus": "scheduled",
+            "__v": 0
+          }
+        }
+      },
+      "GET": {
+        "description": "Get all appointments",
+        "url": "/",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": null,
+        "expected_response": {
+          "status": 200,
+          "body": {
+            "success": true,
+            "count": 3,
+            "data": [
+              {
+                "_id": "appointment_id_1",
+                "DocID": "DOC001",
+                "PatientID": "PAT001",
+                "PatientEmail": "john.doe@example.com",
+                "PatientAddress": "123 Main St, New York, NY 10001",
+                "PatientAppointmentDate": "2026-01-25T10:00:00.000Z",
+                "AppointmentStatus": "scheduled",
+                "__v": 0
+              }
+            ]
+          }
+        }
+      },
+      "GET_BY_ID": {
+        "description": "Get appointment by ID",
+        "url": "/{id}",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": null,
+        "sample_requests": [
+          {
+            "name": "Get Appointment by ID",
+            "url": "/6787abcd9ef0gh1ij2kl3mn4",
+            "description": "Replace with actual MongoDB ID after creating an appointment"
+          }
+        ],
+        "expected_response": {
+          "status": 200,
+          "body": {
+            "success": true,
+            "data": {
+              "_id": "6787abcd9ef0gh1ij2kl3mn4",
+              "DocID": "DOC001",
+              "PatientID": "PAT001",
+              "PatientEmail": "john.doe@example.com",
+              "PatientAddress": "123 Main St, New York, NY 10001",
+              "PatientAppointmentDate": "2026-01-25T10:00:00.000Z",
+              "AppointmentStatus": "scheduled",
+              "__v": 0
+            }
+          }
+        },
+        "error_response": {
+          "status": 404,
+          "body": {
+            "success": false,
+            "message": "Appointment not found"
+          }
+        }
+      },
+      "DELETE": {
+        "description": "Delete appointment by ID",
+        "url": "/{id}",
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "body": null,
+        "sample_requests": [
+          {
+            "name": "Delete Appointment by ID",
+            "url": "/6787abcd9ef0gh1ij2kl3mn4",
+            "description": "Replace with actual MongoDB ID after creating an appointment"
+          }
+        ],
+        "expected_response": {
+          "status": 200,
+          "body": {
+            "success": true,
+            "message": "Appointment deleted successfully",
+            "data": {
+              "_id": "6787abcd9ef0gh1ij2kl3mn4",
+              "DocID": "DOC001",
+              "PatientID": "PAT001",
+              "PatientEmail": "john.doe@example.com",
+              "PatientAddress": "123 Main St, New York, NY 10001",
+              "PatientAppointmentDate": "2026-01-25T10:00:00.000Z",
+              "AppointmentStatus": "scheduled",
+              "__v": 0
+            }
+          }
+        },
+        "error_response": {
+          "status": 404,
+          "body": {
+            "success": false,
+            "message": "Appointment not found"
+          }
+        }
+      }
+    }
+  },
+  "testing_instructions": {
+    "prerequisites": [
+      "Make sure MongoDB is running",
+      "Start the server: npm run dev or npm start",
+      "Server should be running on http://localhost:3000"
+    ],
+    "testing_sequence": [
+      "1. Create appointments using POST requests",
+      "2. Get all appointments using GET request",
+      "3. Get specific appointment using GET_BY_ID (use IDs from step 2)",
+      "4. Delete appointments using DELETE requests (use IDs from step 2)"
+    ],
+    "curl_examples": {
+      "create_appointment": "curl -X POST http://localhost:3000/api/appointments -H \"Content-Type: application/json\" -d '{\"DocID\":\"DOC001\",\"PatientID\":\"PAT001\",\"PatientEmail\":\"john.doe@example.com\",\"PatientAddress\":\"123 Main St, New York, NY 10001\",\"PatientAppointmentDate\":\"2026-01-25T10:00:00.000Z\"}'",
+      "get_all_appointments": "curl -X GET http://localhost:3000/api/appointments -H \"Content-Type: application/json\"",
+      "get_appointment_by_id": "curl -X GET http://localhost:3000/api/appointments/{id} -H \"Content-Type: application/json\"",
+      "delete_appointment": "curl -X DELETE http://localhost:3000/api/appointments/{id} -H \"Content-Type: application/json\""
+    }
+  },
+  "postman_collection": {
+    "info": {
+      "name": "Doctor Appointment System API",
+      "description": "API endpoints for testing doctor appointment system"
+    },
+    "item": [
+      {
+        "name": "Create Appointment",
+        "request": {
+          "method": "POST",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "body": {
+            "mode": "raw",
+            "raw": "{\n  \"DocID\": \"DOC001\",\n  \"PatientID\": \"PAT001\",\n  \"PatientEmail\": \"john.doe@example.com\",\n  \"PatientAddress\": \"123 Main St, New York, NY 10001\",\n  \"PatientAppointmentDate\": \"2026-01-25T10:00:00.000Z\"\n}"
+          },
+          "url": {
+            "raw": "http://localhost:3000/api/appointments",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "3000",
+            "path": ["api", "appointments"]
+          }
+        }
+      },
+      {
+        "name": "Get All Appointments",
+        "request": {
+          "method": "GET",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "url": {
+            "raw": "http://localhost:3000/api/appointments",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "3000",
+            "path": ["api", "appointments"]
+          }
+        }
+      },
+      {
+        "name": "Get Appointment by ID",
+        "request": {
+          "method": "GET",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "url": {
+            "raw": "http://localhost:3000/api/appointments/{{id}}",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "3000",
+            "path": ["api", "appointments", "{{id}}"]
+          }
+        }
+      },
+      {
+        "name": "Delete Appointment",
+        "request": {
+          "method": "DELETE",
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            }
+          ],
+          "url": {
+            "raw": "http://localhost:3000/api/appointments/{{id}}",
+            "protocol": "http",
+            "host": ["localhost"],
+            "port": "3000",
+            "path": ["api", "appointments", "{{id}}"]
+          }
+        }
+      }
+    ]
+  }
+}
