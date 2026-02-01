@@ -1,12 +1,26 @@
-// User model definition for JWT authentication
+import mongoose, { Schema, Document } from "mongoose";
 
-import { Schema, model } from 'mongoose';
+export interface IUser extends Document {
+  email: string;
+  passwordHash: string;
+  role?: string;
+  refreshTokenHash?: string | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+}
 
-const userSchema = new Schema({
-    username: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    // Other user fields as needed
-});
+const userSchema = new Schema<IUser>(
+  {
+    email: { type: String, required: true, unique: true, lowercase: true, trim: true },
+    passwordHash: { type: String, required: true },
+    role: { type: String, default: "user" },
+    refreshTokenHash: { type: String, default: null },
+  },
+  { timestamps: true }
+);
 
-export const User = model('User', userSchema);
+userSchema.index({ email: 1 }, { unique: true });
+
+const User = mongoose.model<IUser>("User", userSchema);
+
+export default User;
