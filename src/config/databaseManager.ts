@@ -22,7 +22,7 @@ class DatabaseManager {
       return;
     }
 
-    const mongoURI = process.env.MONGO_URI;
+    const mongoURI = process.env.MONGODB_URI;
     if (!mongoURI) {
       throw new Error('MongoDB connection failed: MONGO_URI is undefined');
     }
