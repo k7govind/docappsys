@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { sanitizeInput } from "../util/sanitizeFields.js";
+import logger from "../config/logger.js";
 import {
   createDoctorService,
   getAllDoctorsService,
@@ -21,6 +22,12 @@ import { IDoctor } from "../models/doctor.model.js";
 // Create a new doctor
 export const createDoctor = async (req: Request, res: Response): Promise<void> => {
   try {
+    logger.info('Create doctor request received', { 
+      body: { ...req.body, email: req.body.email ? '***@***.com' : undefined },
+      ip: req.ip,
+      userAgent: req.get('User-Agent')
+    });
+    
     const formData = req.body;
 
     // Sanitize input fields
@@ -42,12 +49,20 @@ export const createDoctor = async (req: Request, res: Response): Promise<void> =
     };
 
     const result = await createDoctorService(payload as any);
+    logger.info('Doctor created successfully', { doctorId: result.doctorId, doctorName: `${result.firstName} ${result.lastName}` });
+    
     res.status(201).json({
       success: true,
       message: "Doctor created successfully",
       data: result
     });
   } catch (error: any) {
+    logger.error('Failed to create doctor', { 
+      error: error.message, 
+      stack: error.stack,
+      body: { ...req.body, email: req.body.email ? '***@***.com' : undefined }
+    });
+    
     res.status(400).json({
       success: false,
       message: error.message || "Failed to create doctor"
@@ -58,6 +73,8 @@ export const createDoctor = async (req: Request, res: Response): Promise<void> =
 // Get all doctors with optional filters
 export const getAllDoctors = async (req: Request, res: Response): Promise<void> => {
   try {
+    logger.info('Get all doctors request received', { query: req.query });
+    
     const {
       isActive,
       specialization,
@@ -75,6 +92,13 @@ export const getAllDoctors = async (req: Request, res: Response): Promise<void> 
     };
 
     const result = await getAllDoctorsService(filters);
+    logger.info('Doctors retrieved successfully', { 
+      count: result.doctors.length, 
+      total: result.total,
+      page: result.page,
+      filters 
+    });
+    
     res.status(200).json({
       success: true,
       message: "Doctors retrieved successfully",
@@ -87,6 +111,12 @@ export const getAllDoctors = async (req: Request, res: Response): Promise<void> 
       }
     });
   } catch (error: any) {
+    logger.error('Failed to retrieve doctors', { 
+      error: error.message, 
+      stack: error.stack,
+      query: req.query
+    });
+    
     res.status(500).json({
       success: false,
       message: error.message || "Failed to retrieve doctors"
@@ -97,10 +127,12 @@ export const getAllDoctors = async (req: Request, res: Response): Promise<void> 
 // Get doctor by MongoDB ID
 export const getDoctorById = async (req: Request, res: Response): Promise<void> => {
   try {
+    logger.info('Get doctor by ID request received', { id: req.params.id });
     const { id } = req.params;
     const doctor = await getDoctorByIdService(id as string);
 
     if (!doctor) {
+      logger.warn('Doctor not found', { id: req.params.id });
       res.status(404).json({
         success: false,
         message: "Doctor not found"
@@ -108,12 +140,19 @@ export const getDoctorById = async (req: Request, res: Response): Promise<void> 
       return;
     }
 
+    logger.info('Doctor retrieved successfully', { id: doctor._id, doctorId: doctor.doctorId });
     res.status(200).json({
       success: true,
       message: "Doctor retrieved successfully",
       data: doctor
     });
   } catch (error: any) {
+    logger.error('Failed to retrieve doctor', { 
+      error: error.message, 
+      stack: error.stack,
+      id: req.params.id
+    });
+    
     res.status(500).json({
       success: false,
       message: error.message || "Failed to retrieve doctor"

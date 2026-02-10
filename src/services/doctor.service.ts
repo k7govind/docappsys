@@ -1,4 +1,5 @@
 import Doctor, { IDoctor } from "../models/doctor.model.js";
+import logger from "../config/logger.js";
 
 // Generate unique doctor ID
 const generateDoctorId = (): string => {
@@ -12,9 +13,17 @@ const generateDoctorId = (): string => {
 export const createDoctorService = async (
   data: Omit<IDoctor, "_id" | "doctorId" | "createdAt" | "updatedAt" | "isActive">
 ): Promise<IDoctor> => {
+  logger.debug('Creating new doctor in service', { 
+    email: data.email ? '***@***.com' : undefined,
+    firstName: data.firstName,
+    lastName: data.lastName,
+    specialization: data.specialization
+  });
+  
   // Check if doctor with email already exists
   const existingDoctor = await Doctor.findOne({ email: data.email });
   if (existingDoctor) {
+    logger.warn('Doctor with email already exists', { email: data.email ? '***@***.com' : undefined });
     throw new Error("Doctor with this email already exists");
   }
 
@@ -27,7 +36,13 @@ export const createDoctorService = async (
     isActive: true
   };
 
-  return await Doctor.create(doctorData);
+  const newDoctor = await Doctor.create(doctorData);
+  logger.info('Doctor created in database', { 
+    doctorId: newDoctor.doctorId,
+    doctorName: `${newDoctor.firstName} ${newDoctor.lastName}`
+  });
+  
+  return newDoctor;
 };
 
 // Get all doctors with optional filters
@@ -61,6 +76,8 @@ export const getAllDoctorsService = async (
 
   const skip = (page - 1) * limit;
 
+  logger.debug('Fetching doctors from database', { query, skip, limit });
+  
   const [doctors, total] = await Promise.all([
     Doctor.find(query)
       .sort({ createdAt: -1 })
@@ -69,6 +86,8 @@ export const getAllDoctorsService = async (
       .exec(),
     Doctor.countDocuments(query)
   ]);
+
+  logger.debug('Doctors fetched from database', { count: doctors.length, total });
 
   return {
     doctors,
