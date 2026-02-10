@@ -114,9 +114,7 @@ const doctorSchema = new Schema<IDoctor>(
   }
 );
 
-// Indexes for better performance
-doctorSchema.index({ doctorId: 1 });
-doctorSchema.index({ email: 1 });
+// Indexes for better performance (doctorId and email are already unique indexed by unique: true)
 doctorSchema.index({ specialization: 1 });
 doctorSchema.index({ department: 1 });
 doctorSchema.index({ isActive: 1 });

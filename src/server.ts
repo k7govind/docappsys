@@ -13,12 +13,18 @@ logger.info('Starting Doctor Appointment Booking System', {
   PORT: PORT
 });
 
-connectDB();
-
-app.listen(PORT, '0.0.0.0', () => {
-  logger.info('Server started successfully', { 
-    port: PORT,
-    host: '0.0.0.0'
+// Connect to database first
+connectDB().then(() => {
+  app.listen(PORT, '0.0.0.0', () => {
+    logger.info('Server started successfully', { 
+      port: PORT,
+      host: '0.0.0.0'
+    });
+    console.log(chalk.red(`Server running on port ${PORT}`));
   });
-  console.log(chalk.red(`Server running on port ${PORT}`));
+}).catch((error) => {
+  logger.error('Failed to start server due to database connection error', { 
+    error: error.message 
+  });
+  process.exit(1);
 });
