@@ -7,6 +7,7 @@
     "dev": "node --loader ts-node/esm src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
+    "vercel-build": "tsc",
     "seed": "node seed-database.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -24,6 +25,7 @@
     "express": "^5.2.1",
     "mongoose": "^9.1.4",
     "morgan": "^1.10.1",
+    "vercel": "^50.15.1",
     "winston": "^3.19.0",
     "winston-daily-rotate-file": "^5.0.0"
   },
