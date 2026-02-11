@@ -10,9 +10,19 @@ if (process.env.NODE_ENV !== 'production') {
 import app from "../app.js";
 import connectDB from "../config/db.js";
 
+// Ensure database is connected
+let isConnected = false;
+
+const ensureConnected = async () => {
+  if (!isConnected) {
+    await connectDB();
+    isConnected = true;
+  }
+};
+
 // Export for Vercel serverless
 export default async function handler(req: any, res: any) {
-  await connectDB();
+  await ensureConnected();
   return app(req, res);
 }
 
