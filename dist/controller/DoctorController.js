@@ -1,10 +1,16 @@
-import { sanitizeInput } from "../util/sanitizeFields.js";
-import logger from "../config/logger.js";
-import { createDoctorService, getAllDoctorsService, getDoctorByIdService, getDoctorByDoctorIdService, updateDoctorService, updateDoctorByDoctorIdService, deleteDoctorService, deleteDoctorByDoctorIdService, hardDeleteDoctorService, hardDeleteDoctorByDoctorIdService, getDoctorsBySpecializationService, getDoctorsByDepartmentService, searchDoctorsByNameService, getAvailableDoctorsService } from "../services/doctor.service.js";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getAvailableDoctors = exports.searchDoctorsByName = exports.getDoctorsByDepartment = exports.getDoctorsBySpecialization = exports.hardDeleteDoctorByDoctorId = exports.hardDeleteDoctor = exports.deleteDoctorByDoctorId = exports.deleteDoctor = exports.updateDoctorByDoctorId = exports.updateDoctor = exports.getDoctorByDoctorId = exports.getDoctorById = exports.getAllDoctors = exports.createDoctor = void 0;
+const sanitizeFields_js_1 = require("../util/sanitizeFields.js");
+const logger_js_1 = __importDefault(require("../config/logger.js"));
+const doctor_service_js_1 = require("../services/doctor.service.js");
 // Create a new doctor
-export const createDoctor = async (req, res) => {
+const createDoctor = async (req, res) => {
     try {
-        logger.info('Create doctor request received', {
+        logger_js_1.default.info('Create doctor request received', {
             body: { ...req.body, email: req.body.email ? '***@***.com' : undefined },
             ip: req.ip,
             userAgent: req.get('User-Agent')
@@ -12,23 +18,23 @@ export const createDoctor = async (req, res) => {
         const formData = req.body;
         // Sanitize input fields
         const payload = {
-            firstName: sanitizeInput(formData.firstName),
-            lastName: sanitizeInput(formData.lastName),
-            email: sanitizeInput(formData.email),
-            phone: sanitizeInput(formData.phone),
-            specialization: sanitizeInput(formData.specialization),
-            department: sanitizeInput(formData.department),
+            firstName: (0, sanitizeFields_js_1.sanitizeInput)(formData.firstName),
+            lastName: (0, sanitizeFields_js_1.sanitizeInput)(formData.lastName),
+            email: (0, sanitizeFields_js_1.sanitizeInput)(formData.email),
+            phone: (0, sanitizeFields_js_1.sanitizeInput)(formData.phone),
+            specialization: (0, sanitizeFields_js_1.sanitizeInput)(formData.specialization),
+            department: (0, sanitizeFields_js_1.sanitizeInput)(formData.department),
             experience: Number(formData.experience),
-            qualification: sanitizeInput(formData.qualification),
+            qualification: (0, sanitizeFields_js_1.sanitizeInput)(formData.qualification),
             consultationFee: Number(formData.consultationFee),
             availableDays: formData.availableDays,
             availableTime: {
-                start: sanitizeInput(formData.availableTime.start),
-                end: sanitizeInput(formData.availableTime.end)
+                start: (0, sanitizeFields_js_1.sanitizeInput)(formData.availableTime.start),
+                end: (0, sanitizeFields_js_1.sanitizeInput)(formData.availableTime.end)
             }
         };
-        const result = await createDoctorService(payload);
-        logger.info('Doctor created successfully', { doctorId: result.doctorId, doctorName: `${result.firstName} ${result.lastName}` });
+        const result = await (0, doctor_service_js_1.createDoctorService)(payload);
+        logger_js_1.default.info('Doctor created successfully', { doctorId: result.doctorId, doctorName: `${result.firstName} ${result.lastName}` });
         res.status(201).json({
             success: true,
             message: "Doctor created successfully",
@@ -36,7 +42,7 @@ export const createDoctor = async (req, res) => {
         });
     }
     catch (error) {
-        logger.error('Failed to create doctor', {
+        logger_js_1.default.error('Failed to create doctor', {
             error: error.message,
             stack: error.stack,
             body: { ...req.body, email: req.body.email ? '***@***.com' : undefined }
@@ -47,10 +53,11 @@ export const createDoctor = async (req, res) => {
         });
     }
 };
+exports.createDoctor = createDoctor;
 // Get all doctors with optional filters
-export const getAllDoctors = async (req, res) => {
+const getAllDoctors = async (req, res) => {
     try {
-        logger.info('Get all doctors request received', { query: req.query });
+        logger_js_1.default.info('Get all doctors request received', { query: req.query });
         const { isActive, specialization, department, page = "1", limit = "10" } = req.query;
         const filters = {
             isActive: isActive !== undefined ? isActive === "true" : undefined,
@@ -59,8 +66,8 @@ export const getAllDoctors = async (req, res) => {
             page: parseInt(page),
             limit: parseInt(limit)
         };
-        const result = await getAllDoctorsService(filters);
-        logger.info('Doctors retrieved successfully', {
+        const result = await (0, doctor_service_js_1.getAllDoctorsService)(filters);
+        logger_js_1.default.info('Doctors retrieved successfully', {
             count: result.doctors.length,
             total: result.total,
             page: result.page,
@@ -79,7 +86,7 @@ export const getAllDoctors = async (req, res) => {
         });
     }
     catch (error) {
-        logger.error('Failed to retrieve doctors', {
+        logger_js_1.default.error('Failed to retrieve doctors', {
             error: error.message,
             stack: error.stack,
             query: req.query
@@ -90,21 +97,22 @@ export const getAllDoctors = async (req, res) => {
         });
     }
 };
+exports.getAllDoctors = getAllDoctors;
 // Get doctor by MongoDB ID
-export const getDoctorById = async (req, res) => {
+const getDoctorById = async (req, res) => {
     try {
-        logger.info('Get doctor by ID request received', { id: req.params.id });
+        logger_js_1.default.info('Get doctor by ID request received', { id: req.params.id });
         const { id } = req.params;
-        const doctor = await getDoctorByIdService(id);
+        const doctor = await (0, doctor_service_js_1.getDoctorByIdService)(id);
         if (!doctor) {
-            logger.warn('Doctor not found', { id: req.params.id });
+            logger_js_1.default.warn('Doctor not found', { id: req.params.id });
             res.status(404).json({
                 success: false,
                 message: "Doctor not found"
             });
             return;
         }
-        logger.info('Doctor retrieved successfully', { id: doctor._id, doctorId: doctor.doctorId });
+        logger_js_1.default.info('Doctor retrieved successfully', { id: doctor._id, doctorId: doctor.doctorId });
         res.status(200).json({
             success: true,
             message: "Doctor retrieved successfully",
@@ -112,7 +120,7 @@ export const getDoctorById = async (req, res) => {
         });
     }
     catch (error) {
-        logger.error('Failed to retrieve doctor', {
+        logger_js_1.default.error('Failed to retrieve doctor', {
             error: error.message,
             stack: error.stack,
             id: req.params.id
@@ -123,11 +131,12 @@ export const getDoctorById = async (req, res) => {
         });
     }
 };
+exports.getDoctorById = getDoctorById;
 // Get doctor by doctorId
-export const getDoctorByDoctorId = async (req, res) => {
+const getDoctorByDoctorId = async (req, res) => {
     try {
         const { doctorId } = req.params;
-        const doctor = await getDoctorByDoctorIdService(doctorId);
+        const doctor = await (0, doctor_service_js_1.getDoctorByDoctorIdService)(doctorId);
         if (!doctor) {
             res.status(404).json({
                 success: false,
@@ -148,42 +157,43 @@ export const getDoctorByDoctorId = async (req, res) => {
         });
     }
 };
+exports.getDoctorByDoctorId = getDoctorByDoctorId;
 // Update doctor by MongoDB ID
-export const updateDoctor = async (req, res) => {
+const updateDoctor = async (req, res) => {
     try {
         const { id } = req.params;
         const formData = req.body;
         // Sanitize and prepare update data
         const updateData = {};
         if (formData.firstName !== undefined)
-            updateData.firstName = sanitizeInput(formData.firstName);
+            updateData.firstName = (0, sanitizeFields_js_1.sanitizeInput)(formData.firstName);
         if (formData.lastName !== undefined)
-            updateData.lastName = sanitizeInput(formData.lastName);
+            updateData.lastName = (0, sanitizeFields_js_1.sanitizeInput)(formData.lastName);
         if (formData.email !== undefined)
-            updateData.email = sanitizeInput(formData.email);
+            updateData.email = (0, sanitizeFields_js_1.sanitizeInput)(formData.email);
         if (formData.phone !== undefined)
-            updateData.phone = sanitizeInput(formData.phone);
+            updateData.phone = (0, sanitizeFields_js_1.sanitizeInput)(formData.phone);
         if (formData.specialization !== undefined)
-            updateData.specialization = sanitizeInput(formData.specialization);
+            updateData.specialization = (0, sanitizeFields_js_1.sanitizeInput)(formData.specialization);
         if (formData.department !== undefined)
-            updateData.department = sanitizeInput(formData.department);
+            updateData.department = (0, sanitizeFields_js_1.sanitizeInput)(formData.department);
         if (formData.experience !== undefined)
             updateData.experience = Number(formData.experience);
         if (formData.qualification !== undefined)
-            updateData.qualification = sanitizeInput(formData.qualification);
+            updateData.qualification = (0, sanitizeFields_js_1.sanitizeInput)(formData.qualification);
         if (formData.consultationFee !== undefined)
             updateData.consultationFee = Number(formData.consultationFee);
         if (formData.availableDays !== undefined)
             updateData.availableDays = formData.availableDays;
         if (formData.availableTime !== undefined) {
             updateData.availableTime = {
-                start: sanitizeInput(formData.availableTime.start),
-                end: sanitizeInput(formData.availableTime.end)
+                start: (0, sanitizeFields_js_1.sanitizeInput)(formData.availableTime.start),
+                end: (0, sanitizeFields_js_1.sanitizeInput)(formData.availableTime.end)
             };
         }
         if (formData.isActive !== undefined)
             updateData.isActive = formData.isActive;
-        const result = await updateDoctorService(id, updateData);
+        const result = await (0, doctor_service_js_1.updateDoctorService)(id, updateData);
         if (!result) {
             res.status(404).json({
                 success: false,
@@ -204,42 +214,43 @@ export const updateDoctor = async (req, res) => {
         });
     }
 };
+exports.updateDoctor = updateDoctor;
 // Update doctor by doctorId
-export const updateDoctorByDoctorId = async (req, res) => {
+const updateDoctorByDoctorId = async (req, res) => {
     try {
         const { doctorId } = req.params;
         const formData = req.body;
         // Sanitize and prepare update data
         const updateData = {};
         if (formData.firstName !== undefined)
-            updateData.firstName = sanitizeInput(formData.firstName);
+            updateData.firstName = (0, sanitizeFields_js_1.sanitizeInput)(formData.firstName);
         if (formData.lastName !== undefined)
-            updateData.lastName = sanitizeInput(formData.lastName);
+            updateData.lastName = (0, sanitizeFields_js_1.sanitizeInput)(formData.lastName);
         if (formData.email !== undefined)
-            updateData.email = sanitizeInput(formData.email);
+            updateData.email = (0, sanitizeFields_js_1.sanitizeInput)(formData.email);
         if (formData.phone !== undefined)
-            updateData.phone = sanitizeInput(formData.phone);
+            updateData.phone = (0, sanitizeFields_js_1.sanitizeInput)(formData.phone);
         if (formData.specialization !== undefined)
-            updateData.specialization = sanitizeInput(formData.specialization);
+            updateData.specialization = (0, sanitizeFields_js_1.sanitizeInput)(formData.specialization);
         if (formData.department !== undefined)
-            updateData.department = sanitizeInput(formData.department);
+            updateData.department = (0, sanitizeFields_js_1.sanitizeInput)(formData.department);
         if (formData.experience !== undefined)
             updateData.experience = Number(formData.experience);
         if (formData.qualification !== undefined)
-            updateData.qualification = sanitizeInput(formData.qualification);
+            updateData.qualification = (0, sanitizeFields_js_1.sanitizeInput)(formData.qualification);
         if (formData.consultationFee !== undefined)
             updateData.consultationFee = Number(formData.consultationFee);
         if (formData.availableDays !== undefined)
             updateData.availableDays = formData.availableDays;
         if (formData.availableTime !== undefined) {
             updateData.availableTime = {
-                start: sanitizeInput(formData.availableTime.start),
-                end: sanitizeInput(formData.availableTime.end)
+                start: (0, sanitizeFields_js_1.sanitizeInput)(formData.availableTime.start),
+                end: (0, sanitizeFields_js_1.sanitizeInput)(formData.availableTime.end)
             };
         }
         if (formData.isActive !== undefined)
             updateData.isActive = formData.isActive;
-        const result = await updateDoctorByDoctorIdService(doctorId, updateData);
+        const result = await (0, doctor_service_js_1.updateDoctorByDoctorIdService)(doctorId, updateData);
         if (!result) {
             res.status(404).json({
                 success: false,
@@ -260,11 +271,12 @@ export const updateDoctorByDoctorId = async (req, res) => {
         });
     }
 };
+exports.updateDoctorByDoctorId = updateDoctorByDoctorId;
 // Soft delete doctor by MongoDB ID
-export const deleteDoctor = async (req, res) => {
+const deleteDoctor = async (req, res) => {
     try {
         const { id } = req.params;
-        const result = await deleteDoctorService(id);
+        const result = await (0, doctor_service_js_1.deleteDoctorService)(id);
         if (!result) {
             res.status(404).json({
                 success: false,
@@ -285,11 +297,12 @@ export const deleteDoctor = async (req, res) => {
         });
     }
 };
+exports.deleteDoctor = deleteDoctor;
 // Soft delete doctor by doctorId
-export const deleteDoctorByDoctorId = async (req, res) => {
+const deleteDoctorByDoctorId = async (req, res) => {
     try {
         const { doctorId } = req.params;
-        const result = await deleteDoctorByDoctorIdService(doctorId);
+        const result = await (0, doctor_service_js_1.deleteDoctorByDoctorIdService)(doctorId);
         if (!result) {
             res.status(404).json({
                 success: false,
@@ -310,11 +323,12 @@ export const deleteDoctorByDoctorId = async (req, res) => {
         });
     }
 };
+exports.deleteDoctorByDoctorId = deleteDoctorByDoctorId;
 // Hard delete doctor by MongoDB ID
-export const hardDeleteDoctor = async (req, res) => {
+const hardDeleteDoctor = async (req, res) => {
     try {
         const { id } = req.params;
-        const result = await hardDeleteDoctorService(id);
+        const result = await (0, doctor_service_js_1.hardDeleteDoctorService)(id);
         if (!result) {
             res.status(404).json({
                 success: false,
@@ -335,11 +349,12 @@ export const hardDeleteDoctor = async (req, res) => {
         });
     }
 };
+exports.hardDeleteDoctor = hardDeleteDoctor;
 // Hard delete doctor by doctorId
-export const hardDeleteDoctorByDoctorId = async (req, res) => {
+const hardDeleteDoctorByDoctorId = async (req, res) => {
     try {
         const { doctorId } = req.params;
-        const result = await hardDeleteDoctorByDoctorIdService(doctorId);
+        const result = await (0, doctor_service_js_1.hardDeleteDoctorByDoctorIdService)(doctorId);
         if (!result) {
             res.status(404).json({
                 success: false,
@@ -360,11 +375,12 @@ export const hardDeleteDoctorByDoctorId = async (req, res) => {
         });
     }
 };
+exports.hardDeleteDoctorByDoctorId = hardDeleteDoctorByDoctorId;
 // Get doctors by specialization
-export const getDoctorsBySpecialization = async (req, res) => {
+const getDoctorsBySpecialization = async (req, res) => {
     try {
         const { specialization } = req.params;
-        const doctors = await getDoctorsBySpecializationService(specialization);
+        const doctors = await (0, doctor_service_js_1.getDoctorsBySpecializationService)(specialization);
         res.status(200).json({
             success: true,
             message: "Doctors retrieved successfully",
@@ -379,11 +395,12 @@ export const getDoctorsBySpecialization = async (req, res) => {
         });
     }
 };
+exports.getDoctorsBySpecialization = getDoctorsBySpecialization;
 // Get doctors by department
-export const getDoctorsByDepartment = async (req, res) => {
+const getDoctorsByDepartment = async (req, res) => {
     try {
         const { department } = req.params;
-        const doctors = await getDoctorsByDepartmentService(department);
+        const doctors = await (0, doctor_service_js_1.getDoctorsByDepartmentService)(department);
         res.status(200).json({
             success: true,
             message: "Doctors retrieved successfully",
@@ -398,11 +415,12 @@ export const getDoctorsByDepartment = async (req, res) => {
         });
     }
 };
+exports.getDoctorsByDepartment = getDoctorsByDepartment;
 // Search doctors by name
-export const searchDoctorsByName = async (req, res) => {
+const searchDoctorsByName = async (req, res) => {
     try {
         const { searchTerm } = req.params;
-        const doctors = await searchDoctorsByNameService(searchTerm);
+        const doctors = await (0, doctor_service_js_1.searchDoctorsByNameService)(searchTerm);
         res.status(200).json({
             success: true,
             message: "Doctors retrieved successfully",
@@ -417,8 +435,9 @@ export const searchDoctorsByName = async (req, res) => {
         });
     }
 };
+exports.searchDoctorsByName = searchDoctorsByName;
 // Get available doctors for specific day and time
-export const getAvailableDoctors = async (req, res) => {
+const getAvailableDoctors = async (req, res) => {
     try {
         const { day, time } = req.query;
         if (!day || !time) {
@@ -428,7 +447,7 @@ export const getAvailableDoctors = async (req, res) => {
             });
             return;
         }
-        const doctors = await getAvailableDoctorsService(day, time);
+        const doctors = await (0, doctor_service_js_1.getAvailableDoctorsService)(day, time);
         res.status(200).json({
             success: true,
             message: "Available doctors retrieved successfully",
@@ -443,3 +462,4 @@ export const getAvailableDoctors = async (req, res) => {
         });
     }
 };
+exports.getAvailableDoctors = getAvailableDoctors;

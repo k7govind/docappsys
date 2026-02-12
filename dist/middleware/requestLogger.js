@@ -1,12 +1,18 @@
-import logger from '../config/logger.js';
-export const requestLogger = (req, res, next) => {
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.requestLogger = void 0;
+const logger_js_1 = __importDefault(require("../config/logger.js"));
+const requestLogger = (req, res, next) => {
     const start = Date.now();
     // Store original end function
     const originalEnd = res.end;
     // Override end function to log response
     res.end = function (chunk, encoding) {
         const duration = Date.now() - start;
-        logger.info('HTTP Request completed', {
+        logger_js_1.default.info('HTTP Request completed', {
             method: req.method,
             url: req.url,
             statusCode: res.statusCode,
@@ -20,4 +26,5 @@ export const requestLogger = (req, res, next) => {
     };
     next();
 };
-export default requestLogger;
+exports.requestLogger = requestLogger;
+exports.default = exports.requestLogger;

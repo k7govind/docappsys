@@ -1,8 +1,10 @@
-import { Router } from "express";
-import { createAppointment, getAllAppointments, getAppointmentById, deleteAppointment } from "../controller/AppointmentController.js";
-const router = Router();
-router.post("/", createAppointment);
-router.get("/:id", getAppointmentById);
-router.get("/", getAllAppointments);
-router.delete("/:id", deleteAppointment);
-export default router;
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const AppointmentController_js_1 = require("../controller/AppointmentController.js");
+const router = (0, express_1.Router)();
+router.post("/", AppointmentController_js_1.createAppointment);
+router.get("/:id", AppointmentController_js_1.getAppointmentById);
+router.get("/", AppointmentController_js_1.getAllAppointments);
+router.delete("/:id", AppointmentController_js_1.deleteAppointment);
+exports.default = router;

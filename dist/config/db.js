@@ -1,28 +1,35 @@
-import DatabaseManager from "./databaseManager.js";
-import chalk from 'chalk';
-import logger from "./logger.js";
-const dbManager = DatabaseManager.getInstance();
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ensureDatabaseConnection = exports.checkDatabaseConnection = void 0;
+const databaseManager_js_1 = __importDefault(require("./databaseManager.js"));
+const chalk_1 = __importDefault(require("chalk"));
+const logger_js_1 = __importDefault(require("./logger.js"));
+const dbManager = databaseManager_js_1.default.getInstance();
 const connectDB = async () => {
     try {
         await dbManager.connect();
-        console.log(chalk.blue.bgRed.bold("MongoDB connected successfully"));
+        console.log(chalk_1.default.blue.bgRed.bold("MongoDB connected successfully"));
     }
     catch (error) {
-        logger.error('MongoDB connection failed', {
+        logger_js_1.default.error('MongoDB connection failed', {
             error: error.message,
             stack: error.stack
         });
-        console.error(chalk.blue.bgRed.bold("MongoDB connection failed:", error.message));
+        console.error(chalk_1.default.blue.bgRed.bold("MongoDB connection failed:", error.message));
         process.exit(1);
     }
 };
 // Health check function to verify database connection
-export const checkDatabaseConnection = async () => {
+const checkDatabaseConnection = async () => {
     return await dbManager.healthCheck();
 };
+exports.checkDatabaseConnection = checkDatabaseConnection;
 // Middleware to ensure database connection before processing requests
-export const ensureDatabaseConnection = async (req, res, next) => {
-    const isConnected = await checkDatabaseConnection();
+const ensureDatabaseConnection = async (req, res, next) => {
+    const isConnected = await (0, exports.checkDatabaseConnection)();
     if (!isConnected) {
         return res.status(503).json({
             success: false,
@@ -31,4 +38,5 @@ export const ensureDatabaseConnection = async (req, res, next) => {
     }
     next();
 };
-export default connectDB;
+exports.ensureDatabaseConnection = ensureDatabaseConnection;
+exports.default = connectDB;

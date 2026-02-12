@@ -1,5 +1,10 @@
-import mongoose from 'mongoose';
-import logger from './logger.js';
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose_1 = __importDefault(require("mongoose"));
+const logger_js_1 = __importDefault(require("./logger.js"));
 class DatabaseManager {
     constructor() {
         this.connectionAttempts = 0;
@@ -13,8 +18,8 @@ class DatabaseManager {
         return DatabaseManager.instance;
     }
     async connect() {
-        if (mongoose.connection.readyState === 1) {
-            logger.info('MongoDB already connected');
+        if (mongoose_1.default.connection.readyState === 1) {
+            logger_js_1.default.info('MongoDB already connected');
             return;
         }
         const mongoURI = process.env.MONGODB_URI;
@@ -25,8 +30,8 @@ class DatabaseManager {
     }
     async connectWithRetry(mongoURI) {
         try {
-            logger.info(`Attempting MongoDB connection (attempt ${this.connectionAttempts + 1}/${this.maxRetries})`);
-            await mongoose.connect(mongoURI, {
+            logger_js_1.default.info(`Attempting MongoDB connection (attempt ${this.connectionAttempts + 1}/${this.maxRetries})`);
+            await mongoose_1.default.connect(mongoURI, {
                 serverSelectionTimeoutMS: 30000,
                 socketTimeoutMS: 60000,
                 bufferCommands: false,
@@ -39,21 +44,21 @@ class DatabaseManager {
             });
             this.setupConnectionListeners();
             this.connectionAttempts = 0; // Reset on successful connection
-            logger.info('MongoDB connected successfully', {
-                host: mongoose.connection.host,
-                port: mongoose.connection.port,
-                database: mongoose.connection.name
+            logger_js_1.default.info('MongoDB connected successfully', {
+                host: mongoose_1.default.connection.host,
+                port: mongoose_1.default.connection.port,
+                database: mongoose_1.default.connection.name
             });
         }
         catch (error) {
             this.connectionAttempts++;
-            logger.error('MongoDB connection failed', {
+            logger_js_1.default.error('MongoDB connection failed', {
                 error: error.message,
                 attempt: `${this.connectionAttempts}/${this.maxRetries}`
             });
             if (this.connectionAttempts < this.maxRetries) {
                 const delay = this.retryDelay * this.connectionAttempts; // Exponential backoff
-                logger.info(`Retrying connection in ${delay}ms...`);
+                logger_js_1.default.info(`Retrying connection in ${delay}ms...`);
                 await new Promise(resolve => setTimeout(resolve, delay));
                 return this.connectWithRetry(mongoURI);
             }
@@ -63,17 +68,17 @@ class DatabaseManager {
         }
     }
     setupConnectionListeners() {
-        mongoose.connection.on('error', (err) => {
-            logger.error('MongoDB connection error', { error: err.message });
+        mongoose_1.default.connection.on('error', (err) => {
+            logger_js_1.default.error('MongoDB connection error', { error: err.message });
         });
-        mongoose.connection.on('disconnected', () => {
-            logger.warn('MongoDB disconnected');
+        mongoose_1.default.connection.on('disconnected', () => {
+            logger_js_1.default.warn('MongoDB disconnected');
         });
-        mongoose.connection.on('reconnected', () => {
-            logger.info('MongoDB reconnected');
+        mongoose_1.default.connection.on('reconnected', () => {
+            logger_js_1.default.info('MongoDB reconnected');
         });
-        mongoose.connection.on('close', () => {
-            logger.info('MongoDB connection closed');
+        mongoose_1.default.connection.on('close', () => {
+            logger_js_1.default.info('MongoDB connection closed');
         });
         // Graceful shutdown
         process.on('SIGINT', async () => {
@@ -86,30 +91,30 @@ class DatabaseManager {
         });
     }
     async disconnect() {
-        if (mongoose.connection.readyState === 1) {
-            await mongoose.connection.close();
-            logger.info('MongoDB connection closed gracefully');
+        if (mongoose_1.default.connection.readyState === 1) {
+            await mongoose_1.default.connection.close();
+            logger_js_1.default.info('MongoDB connection closed gracefully');
         }
     }
     async healthCheck() {
         try {
-            if (mongoose.connection.readyState !== 1) {
+            if (mongoose_1.default.connection.readyState !== 1) {
                 return false;
             }
-            if (mongoose.connection.db) {
-                await mongoose.connection.db.admin().ping();
+            if (mongoose_1.default.connection.db) {
+                await mongoose_1.default.connection.db.admin().ping();
                 return true;
             }
             return false;
         }
         catch (error) {
-            logger.error('Database health check failed', { error: error.message });
+            logger_js_1.default.error('Database health check failed', { error: error.message });
             return false;
         }
     }
     getConnectionState() {
         const states = ['disconnected', 'connected', 'connecting', 'disconnecting'];
-        return states[mongoose.connection.readyState] || 'unknown';
+        return states[mongoose_1.default.connection.readyState] || 'unknown';
     }
 }
-export default DatabaseManager;
+exports.default = DatabaseManager;

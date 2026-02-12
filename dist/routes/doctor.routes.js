@@ -1,22 +1,24 @@
-import { Router } from "express";
-import { createDoctor, getAllDoctors, getDoctorById, getDoctorByDoctorId, updateDoctor, updateDoctorByDoctorId, deleteDoctor, deleteDoctorByDoctorId, hardDeleteDoctor, hardDeleteDoctorByDoctorId, getDoctorsBySpecialization, getDoctorsByDepartment, searchDoctorsByName, getAvailableDoctors } from "../controller/DoctorController.js";
-const router = Router();
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = require("express");
+const DoctorController_js_1 = require("../controller/DoctorController.js");
+const router = (0, express_1.Router)();
 // Basic CRUD operations
-router.post("/", createDoctor);
-router.get("/", getAllDoctors);
-router.get("/:id", getDoctorById);
-router.put("/:id", updateDoctor);
-router.delete("/:id", deleteDoctor);
+router.post("/", DoctorController_js_1.createDoctor);
+router.get("/", DoctorController_js_1.getAllDoctors);
+router.get("/:id", DoctorController_js_1.getDoctorById);
+router.put("/:id", DoctorController_js_1.updateDoctor);
+router.delete("/:id", DoctorController_js_1.deleteDoctor);
 // Operations using doctorId
-router.get("/doctor-id/:doctorId", getDoctorByDoctorId);
-router.put("/doctor-id/:doctorId", updateDoctorByDoctorId);
-router.delete("/doctor-id/:doctorId", deleteDoctorByDoctorId);
+router.get("/doctor-id/:doctorId", DoctorController_js_1.getDoctorByDoctorId);
+router.put("/doctor-id/:doctorId", DoctorController_js_1.updateDoctorByDoctorId);
+router.delete("/doctor-id/:doctorId", DoctorController_js_1.deleteDoctorByDoctorId);
 // Hard delete endpoints (permanent deletion)
-router.delete("/:id/hard", hardDeleteDoctor);
-router.delete("/doctor-id/:doctorId/hard", hardDeleteDoctorByDoctorId);
+router.delete("/:id/hard", DoctorController_js_1.hardDeleteDoctor);
+router.delete("/doctor-id/:doctorId/hard", DoctorController_js_1.hardDeleteDoctorByDoctorId);
 // Search and filter endpoints
-router.get("/specialization/:specialization", getDoctorsBySpecialization);
-router.get("/department/:department", getDoctorsByDepartment);
-router.get("/search/:searchTerm", searchDoctorsByName);
-router.get("/available", getAvailableDoctors);
-export default router;
+router.get("/specialization/:specialization", DoctorController_js_1.getDoctorsBySpecialization);
+router.get("/department/:department", DoctorController_js_1.getDoctorsByDepartment);
+router.get("/search/:searchTerm", DoctorController_js_1.searchDoctorsByName);
+router.get("/available", DoctorController_js_1.getAvailableDoctors);
+exports.default = router;

@@ -1,5 +1,11 @@
-import Doctor from "../models/doctor.model.js";
-import logger from "../config/logger.js";
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getAvailableDoctorsService = exports.searchDoctorsByNameService = exports.getDoctorsByDepartmentService = exports.getDoctorsBySpecializationService = exports.hardDeleteDoctorByDoctorIdService = exports.hardDeleteDoctorService = exports.deleteDoctorByDoctorIdService = exports.deleteDoctorService = exports.updateDoctorByDoctorIdService = exports.updateDoctorService = exports.getDoctorByDoctorIdService = exports.getDoctorByIdService = exports.getAllDoctorsService = exports.createDoctorService = void 0;
+const doctor_model_js_1 = __importDefault(require("../models/doctor.model.js"));
+const logger_js_1 = __importDefault(require("../config/logger.js"));
 // Generate unique doctor ID
 const generateDoctorId = () => {
     const prefix = "DOC";
@@ -8,17 +14,17 @@ const generateDoctorId = () => {
     return `${prefix}${timestamp}${random}`;
 };
 // Create a new doctor
-export const createDoctorService = async (data) => {
-    logger.debug('Creating new doctor in service', {
+const createDoctorService = async (data) => {
+    logger_js_1.default.debug('Creating new doctor in service', {
         email: data.email ? '***@***.com' : undefined,
         firstName: data.firstName,
         lastName: data.lastName,
         specialization: data.specialization
     });
     // Check if doctor with email already exists
-    const existingDoctor = await Doctor.findOne({ email: data.email });
+    const existingDoctor = await doctor_model_js_1.default.findOne({ email: data.email });
     if (existingDoctor) {
-        logger.warn('Doctor with email already exists', { email: data.email ? '***@***.com' : undefined });
+        logger_js_1.default.warn('Doctor with email already exists', { email: data.email ? '***@***.com' : undefined });
         throw new Error("Doctor with this email already exists");
     }
     // Generate unique doctor ID
@@ -28,15 +34,16 @@ export const createDoctorService = async (data) => {
         doctorId,
         isActive: true
     };
-    const newDoctor = await Doctor.create(doctorData);
-    logger.info('Doctor created in database', {
+    const newDoctor = await doctor_model_js_1.default.create(doctorData);
+    logger_js_1.default.info('Doctor created in database', {
         doctorId: newDoctor.doctorId,
         doctorName: `${newDoctor.firstName} ${newDoctor.lastName}`
     });
     return newDoctor;
 };
+exports.createDoctorService = createDoctorService;
 // Get all doctors with optional filters
-export const getAllDoctorsService = async (filters = {}) => {
+const getAllDoctorsService = async (filters = {}) => {
     const { isActive, specialization, department, page = 1, limit = 10 } = filters;
     // Build query
     const query = {};
@@ -47,16 +54,16 @@ export const getAllDoctorsService = async (filters = {}) => {
     if (department)
         query.department = new RegExp(department, 'i');
     const skip = (page - 1) * limit;
-    logger.debug('Fetching doctors from database', { query, skip, limit });
+    logger_js_1.default.debug('Fetching doctors from database', { query, skip, limit });
     const [doctors, total] = await Promise.all([
-        Doctor.find(query)
+        doctor_model_js_1.default.find(query)
             .sort({ createdAt: -1 })
             .skip(skip)
             .limit(limit)
             .exec(),
-        Doctor.countDocuments(query)
+        doctor_model_js_1.default.countDocuments(query)
     ]);
-    logger.debug('Doctors fetched from database', { count: doctors.length, total });
+    logger_js_1.default.debug('Doctors fetched from database', { count: doctors.length, total });
     return {
         doctors,
         total,
@@ -64,19 +71,22 @@ export const getAllDoctorsService = async (filters = {}) => {
         totalPages: Math.ceil(total / limit)
     };
 };
+exports.getAllDoctorsService = getAllDoctorsService;
 // Get doctor by ID
-export const getDoctorByIdService = async (id) => {
-    return await Doctor.findById(id);
+const getDoctorByIdService = async (id) => {
+    return await doctor_model_js_1.default.findById(id);
 };
+exports.getDoctorByIdService = getDoctorByIdService;
 // Get doctor by doctorId
-export const getDoctorByDoctorIdService = async (doctorId) => {
-    return await Doctor.findOne({ doctorId });
+const getDoctorByDoctorIdService = async (doctorId) => {
+    return await doctor_model_js_1.default.findOne({ doctorId });
 };
+exports.getDoctorByDoctorIdService = getDoctorByDoctorIdService;
 // Update doctor by ID
-export const updateDoctorService = async (id, data) => {
+const updateDoctorService = async (id, data) => {
     // Check if email is being updated and if it's already taken
     if (data.email) {
-        const existingDoctor = await Doctor.findOne({
+        const existingDoctor = await doctor_model_js_1.default.findOne({
             email: data.email,
             _id: { $ne: id }
         });
@@ -84,13 +94,14 @@ export const updateDoctorService = async (id, data) => {
             throw new Error("Doctor with this email already exists");
         }
     }
-    return await Doctor.findByIdAndUpdate(id, data, { new: true, runValidators: true });
+    return await doctor_model_js_1.default.findByIdAndUpdate(id, data, { new: true, runValidators: true });
 };
+exports.updateDoctorService = updateDoctorService;
 // Update doctor by doctorId
-export const updateDoctorByDoctorIdService = async (doctorId, data) => {
+const updateDoctorByDoctorIdService = async (doctorId, data) => {
     // Check if email is being updated and if it's already taken
     if (data.email) {
-        const existingDoctor = await Doctor.findOne({
+        const existingDoctor = await doctor_model_js_1.default.findOne({
             email: data.email,
             doctorId: { $ne: doctorId }
         });
@@ -98,42 +109,49 @@ export const updateDoctorByDoctorIdService = async (doctorId, data) => {
             throw new Error("Doctor with this email already exists");
         }
     }
-    return await Doctor.findOneAndUpdate({ doctorId }, data, { new: true, runValidators: true });
+    return await doctor_model_js_1.default.findOneAndUpdate({ doctorId }, data, { new: true, runValidators: true });
 };
+exports.updateDoctorByDoctorIdService = updateDoctorByDoctorIdService;
 // Delete doctor by ID (soft delete - set isActive to false)
-export const deleteDoctorService = async (id) => {
-    return await Doctor.findByIdAndUpdate(id, { isActive: false }, { new: true });
+const deleteDoctorService = async (id) => {
+    return await doctor_model_js_1.default.findByIdAndUpdate(id, { isActive: false }, { new: true });
 };
+exports.deleteDoctorService = deleteDoctorService;
 // Delete doctor by doctorId (soft delete)
-export const deleteDoctorByDoctorIdService = async (doctorId) => {
-    return await Doctor.findOneAndUpdate({ doctorId }, { isActive: false }, { new: true });
+const deleteDoctorByDoctorIdService = async (doctorId) => {
+    return await doctor_model_js_1.default.findOneAndUpdate({ doctorId }, { isActive: false }, { new: true });
 };
+exports.deleteDoctorByDoctorIdService = deleteDoctorByDoctorIdService;
 // Hard delete doctor by ID (permanently remove from database)
-export const hardDeleteDoctorService = async (id) => {
-    return await Doctor.findByIdAndDelete(id);
+const hardDeleteDoctorService = async (id) => {
+    return await doctor_model_js_1.default.findByIdAndDelete(id);
 };
+exports.hardDeleteDoctorService = hardDeleteDoctorService;
 // Hard delete doctor by doctorId
-export const hardDeleteDoctorByDoctorIdService = async (doctorId) => {
-    return await Doctor.findOneAndDelete({ doctorId });
+const hardDeleteDoctorByDoctorIdService = async (doctorId) => {
+    return await doctor_model_js_1.default.findOneAndDelete({ doctorId });
 };
+exports.hardDeleteDoctorByDoctorIdService = hardDeleteDoctorByDoctorIdService;
 // Get doctors by specialization
-export const getDoctorsBySpecializationService = async (specialization) => {
-    return await Doctor.find({
+const getDoctorsBySpecializationService = async (specialization) => {
+    return await doctor_model_js_1.default.find({
         specialization: new RegExp(specialization, 'i'),
         isActive: true
     });
 };
+exports.getDoctorsBySpecializationService = getDoctorsBySpecializationService;
 // Get doctors by department
-export const getDoctorsByDepartmentService = async (department) => {
-    return await Doctor.find({
+const getDoctorsByDepartmentService = async (department) => {
+    return await doctor_model_js_1.default.find({
         department: new RegExp(department, 'i'),
         isActive: true
     });
 };
+exports.getDoctorsByDepartmentService = getDoctorsByDepartmentService;
 // Search doctors by name
-export const searchDoctorsByNameService = async (searchTerm) => {
+const searchDoctorsByNameService = async (searchTerm) => {
     const regex = new RegExp(searchTerm, 'i');
-    return await Doctor.find({
+    return await doctor_model_js_1.default.find({
         $or: [
             { firstName: regex },
             { lastName: regex },
@@ -142,12 +160,14 @@ export const searchDoctorsByNameService = async (searchTerm) => {
         isActive: true
     });
 };
+exports.searchDoctorsByNameService = searchDoctorsByNameService;
 // Get available doctors for a specific day and time
-export const getAvailableDoctorsService = async (day, time) => {
-    return await Doctor.find({
+const getAvailableDoctorsService = async (day, time) => {
+    return await doctor_model_js_1.default.find({
         availableDays: { $in: [day] },
         "availableTime.start": { $lte: time },
         "availableTime.end": { $gte: time },
         isActive: true
     });
 };
+exports.getAvailableDoctorsService = getAvailableDoctorsService;
