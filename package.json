@@ -5,7 +5,7 @@
   "main": "dist/server.js",
   "scripts": {
 "dev": "ts-node src/server.ts",
-  "clean": "rimraf dist",
+  "clean": "rm -rf dist",
   "build": "pnpm clean && tsc",
   "start": "node dist/server.js",
   "prod": "pnpm build && pnpm start",
