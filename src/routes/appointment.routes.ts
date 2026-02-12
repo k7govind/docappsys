@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { createAppointment, getAllAppointments, getAppointmentById, deleteAppointment } from "../controller/AppointmentController.js";
-import { sendReminder, updateReminderPreferences, getReminderStatus, testReminderJob, getJobStatus } from "../controllers/reminder.controller.js";
+import { sendReminder, updateReminderPreferences, getReminderStatus, testReminderJob, getJobStatus } from "../controller/reminder.controller.js";
 
 const router : Router = Router();
 
