@@ -4,14 +4,13 @@
   "description": "",
   "main": "dist/server.js",
   "scripts": {
-"dev": "ts-node src/server.ts",
+  "dev": "ts-node src/server.ts",
   "clean": "rm -rf dist",
-  "build": "pnpm clean && tsc",
+  "build": "tsc",
   "start": "node dist/server.js",
-  "prod": "pnpm build && pnpm start",
-  "vercel-build": "tsc",
-    "seed": "node seed-database.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "prod": "pnpm run build && pnpm start",
+  "seed": "node seed-database.js",
+  "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "Docapp",
