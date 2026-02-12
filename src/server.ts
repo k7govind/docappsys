@@ -6,7 +6,7 @@ dotenv.config();
 import app from "./app.js";
 import connectDB from "./config/db.js";
 
-const PORT = Number(process.env.PORT) || 3000;
+const PORT = Number(process.env.PORT) || 8080;
 
 logger.info('Starting Doctor Appointment Booking System', { 
   NODE_ENV: process.env.NODE_ENV || 'development',
