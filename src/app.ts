@@ -1,6 +1,8 @@
 import express from "express";
 import appointmentRoutes from "./routes/appointment.routes.js";
 import doctorRoutes from "./routes/doctor.routes.js";
+import paymentRoutes from "./routes/payment.routes.js";
+import webhookRoutes from "./routes/webhook.routes.js";
 import requestLogger from "./middleware/requestLogger.js";
 import { ensureDatabaseConnection } from "./config/db.js";
 //import authRoutes from "./routes/auth.routes.js";
@@ -18,5 +20,7 @@ app.get("/", (req, res) => {
 // Add database connection check for API routes
 app.use("/api/appointments", ensureDatabaseConnection, appointmentRoutes);
 app.use("/api/doctors", ensureDatabaseConnection, doctorRoutes);
+app.use("/api/payments", ensureDatabaseConnection, paymentRoutes);
+app.use("/api/webhooks", webhookRoutes);
 
 export default app;

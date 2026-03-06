@@ -17,6 +17,19 @@ export interface IAppointment extends Document {
   lastReminderSent?: Date;
   createdAt?: Date;
   updatedAt?: Date;
+  paymentStatus?: "pending" | "paid" | "refunded" | "failed" | "cancelled";
+  paymentMethod?: "stripe" | "paypal" | "cash" | "insurance";
+  paymentAmount?: number;
+  paymentCurrency?: string;
+  transactionId?: string;
+  stripePaymentIntentId?: string;
+  paypalOrderId?: string;
+  paypalCaptureId?: string;
+  paymentDate?: Date;
+  refundAmount?: number;
+  refundDate?: Date;
+  refundReason?: string;
+  paymentMetadata?: Record<string, any>;
 }
 
 const appointmentSchema = new Schema<IAppointment>(
@@ -43,7 +56,28 @@ const appointmentSchema = new Schema<IAppointment>(
         max: 168
       }
     },
-    lastReminderSent: { type: Date, default: null }
+    lastReminderSent: { type: Date, default: null },
+    paymentStatus: { 
+      type: String, 
+      enum: ["pending", "paid", "refunded", "failed", "cancelled"],
+      default: "pending" 
+    },
+    paymentMethod: { 
+      type: String, 
+      enum: ["stripe", "paypal", "cash", "insurance"],
+      default: null 
+    },
+    paymentAmount: { type: Number, default: null },
+    paymentCurrency: { type: String, default: "USD" },
+    transactionId: { type: String, default: null },
+    stripePaymentIntentId: { type: String, default: null },
+    paypalOrderId: { type: String, default: null },
+    paypalCaptureId: { type: String, default: null },
+    paymentDate: { type: Date, default: null },
+    refundAmount: { type: Number, default: null },
+    refundDate: { type: Date, default: null },
+    refundReason: { type: String, default: null },
+    paymentMetadata: { type: Schema.Types.Mixed, default: {} }
   },
   { timestamps: true }
 );
@@ -55,6 +89,12 @@ appointmentSchema.index({ AppointmentStatus: 1 });
 appointmentSchema.index({ emailReminderSent: 1 });
 appointmentSchema.index({ smsReminderSent: 1 });
 appointmentSchema.index({ lastReminderSent: 1 });
+appointmentSchema.index({ paymentStatus: 1 });
+appointmentSchema.index({ paymentMethod: 1 });
+appointmentSchema.index({ transactionId: 1 });
+appointmentSchema.index({ stripePaymentIntentId: 1 });
+appointmentSchema.index({ paypalOrderId: 1 });
+appointmentSchema.index({ paymentDate: 1 });
 
 const Appointment = mongoose.model<IAppointment>(
   "Appointment",
